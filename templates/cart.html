@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/style.css">
+  <title>سبد خرید</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body dir="rtl">
+  <div class="cart-container">
+    <h1>🛒 سبد خرید</h1>
+
+    {% if cart %}
+      <ul class="cart-list">
+        {% for product, quantity in cart.items() %}
+          <li class="cart-item">
+            <span class="product-name">{{ product }}</span>
+            <span class="product-quantity">تعداد: {{ quantity }}</span>
+            <span class="product-quantity">قیمت کل: {{ quantity *products.find_one({'product':product}).get('price') }}</span>
+          </li>
+        {% endfor %}
+        <button>قیمت نهایی کل خرید:{{total_price}}</button>
+         <form action="" method="post">
+      <input type="submit" value="نهایی کردن سبد خرید">
+    </form>
+      </ul>
+    {% else %}
+      <p class="empty-message">سبد خرید خالی است.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
