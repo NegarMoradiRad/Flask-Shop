@@ -4,6 +4,7 @@ import bcrypt
 import re
 import json
 from datetime import timedelta
+import datetime
 
 client=MongoClient("mongodb://localhost:27017/")
 db=client["shop"]
@@ -15,7 +16,7 @@ collection_users=db["users"]
 app=Flask(__name__)
 app.secret_key="your_secret_key"
 app.permanent_session_lifetime = timedelta(minutes=30)
-
+expires = datetime.utcnow() + timedelta(days=7)
 upload_folder="/static/upload"
 app.config["UPLOAD_FOLDER"]=upload_folder
 
@@ -102,7 +103,7 @@ def add_to_cart():
    else:
       cart[product]=1
    res=make_response(render_template("dashboard.html",send=product,products=products))
-   res.set_cookie('cart',json.dumps(cart))
+   res.set_cookie('cart',json.dumps(cart),expires=expires)
    return res
 @app.route('/remove_from_cart', methods=['POST'])
 def remove_from_cart():
