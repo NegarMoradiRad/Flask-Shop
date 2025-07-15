@@ -35,17 +35,6 @@
       ✅ با موفقیت به سبد خرید اضافه شد
     </div>
     {% endif %}
-
-     {% if rmv == product['product'] %}
-    <div class="remove-message">
-      ❌ محصول مورد نظر از سبد خرید حذف شد
-    </div>
-    {% endif %}
-
-    <form action="{{url_for('remove_from_cart')}}" method="post">
-      <input type="hidden" name="product" value="{{product['product']}}">
-      <button type="submit" class="remove-btn">حذف از سبد خرید</button>
-    </form>
   </div>
   {% endfor %}
 </div>

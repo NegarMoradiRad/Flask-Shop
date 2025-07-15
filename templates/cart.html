@@ -19,7 +19,16 @@
             <span class="product-name">{{ product }}</span>
             <span class="product-quantity">تعداد: {{ quantity }}</span>
             <span class="product-quantity">قیمت کل: {{ quantity *products.find_one({'product':product}).get('price') }}</span>
+            <span> <form action="{{url_for('remove_from_cart')}}" method="post">
+      <input type="hidden" name="product" value="{{product}}">
+      <button type="submit" class="remove-btn">حذف از سبد خرید</button>
+    </form></span>
           </li>
+           {% if rmv == product %}
+    <div class="remove-message">
+      ❌ یک محصول از سبد خرید حذف شد
+    </div>
+    {% endif %}
         {% endfor %}
         <button class="login-btn">قیمت نهایی کل خرید:{{total_price}}</button>
         <form action="{{ url_for('buy') }}" method="get">

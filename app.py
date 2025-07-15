@@ -3,8 +3,7 @@ from pymongo import MongoClient
 import bcrypt
 import re
 import json
-from datetime import timedelta
-import datetime
+from datetime import timedelta,datetime
 
 client=MongoClient("mongodb://localhost:27017/")
 db=client["shop"]
@@ -90,8 +89,9 @@ def register():
     return render_template("register.html",send=True)
 @app.route('/dashboard')
 def dashboard():
+    send = request.args.get('send')
     products = list(collection_products.find())  
-    return render_template("dashboard.html",products=products)
+    return render_template("dashboard.html",products=products,send=send)
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
    products = list(collection_products.find()) 
@@ -102,29 +102,32 @@ def add_to_cart():
       cart[product]+=1
    else:
       cart[product]=1
-   res=make_response(render_template("dashboard.html",send=product,products=products))
+   res=make_response(redirect(url_for("dashboard",send=product,products=products)))
    res.set_cookie('cart',json.dumps(cart),expires=expires)
    return res
 @app.route('/remove_from_cart', methods=['POST'])
 def remove_from_cart():
-   products=list(collection_products.find())
+   products=collection_products
    product=request.form.get('product')
    re_cookie=request.cookies.get('cart')
    cart=json.loads(re_cookie) if re_cookie else {}
    if product in cart:
-      cart.pop(product)
-   res=make_response(render_template('dashboard.html', rmv=product,products=products))
+      cart[product]-=1
+      if cart[product]==0:
+         cart.pop(product)
+   res=make_response(redirect(url_for('viewcart', rmv=product,products=products)))
    res.set_cookie('cart',json.dumps(cart))
    return res
 @app.route('/viewcart')
 def viewcart():
+   rmv = request.args.get('rmv')
    products=collection_products
    cart_cookie=request.cookies.get('cart')
    cart=json.loads(cart_cookie) if cart_cookie else {}
    total_price=0
    for p , q in cart.items():
       total_price+=q*products.find_one({"product":p}).get('price')
-   return render_template('cart.html',cart=cart,products=products,total_price=total_price)
+   return render_template('cart.html',cart=cart,products=products,total_price=total_price,rmv=rmv)
 @app.route('/buy', methods=['POST', 'GET'])
 def buy():
     if 'user' not in session:
