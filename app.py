@@ -22,7 +22,7 @@ app.config["UPLOAD_FOLDER"]=upload_folder
 @app.route('/')
 def homepage():
     products = list(collection_products.find())  
-    return render_template("dashbord.html",products=products)
+    return render_template("dashboard.html",products=products)
 
 @app.route('/login', methods=['POST','GET'])
 def login():
@@ -87,10 +87,10 @@ def register():
 
     collection_users.insert_one(document)
     return render_template("register.html",send=True)
-@app.route('/dashbord')
-def dashbord():
+@app.route('/dashboard')
+def dashboard():
     products = list(collection_products.find())  
-    return render_template("dashbord.html",products=products)
+    return render_template("dashboard.html",products=products)
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
    products = list(collection_products.find()) 
@@ -101,7 +101,7 @@ def add_to_cart():
       cart[product]+=1
    else:
       cart[product]=1
-   res=make_response(render_template("dashbord.html",send=product,products=products))
+   res=make_response(render_template("dashboard.html",send=product,products=products))
    res.set_cookie('cart',json.dumps(cart))
    return res
 @app.route('/remove_from_cart', methods=['POST'])
@@ -112,7 +112,7 @@ def remove_from_cart():
    cart=json.loads(re_cookie) if re_cookie else {}
    if product in cart:
       cart.pop(product)
-   res=make_response(render_template('dashbord.html', rmv=product,products=products))
+   res=make_response(render_template('dashboard.html', rmv=product,products=products))
    res.set_cookie('cart',json.dumps(cart))
    return res
 @app.route('/viewcart')
