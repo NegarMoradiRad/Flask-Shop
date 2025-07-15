@@ -1,56 +1,61 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>داشبورد</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    </head>
-    <body dir="rtl">
-  <div class="header">
-  <div class="header-image">
-    <img src="{{ url_for('static', filename='upload/'+'mobile.gif') }}" class="mobile-img" alt="موبایل">
-  </div>
-  <div class="header-content">
-    <h1>فروشگاه دیجیتال</h1>
-    <p>به فروشگاه دیجیتال خوش آمدید!</p>
-    <a href="{{ url_for('viewcart') }}">🛒 مشاهده سبد خرید</a>
-  </div>
-</div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylish Login</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='buy.css')}}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap">
+</head>
+<body dir="rtl">
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        {%if send%}
+        <p class="success-message">پرداخت{{total_price}}تومان
+         خرید شما با موفقیت انجام شد!</p>
+        {%endif%}
+        {%if errors%}
+        <ul class="error-box">
+        {%for error in errors%}
+        <li>{{error}}</li>
+        {%endfor%}
+        </ul>
+        {%endif%}
+        <div class="form-box">
+            {%if user%}
+        <h2>نام کاربر:{{user.get("نام و نام خانوادگی")}}</h2>
+        {%endif%}
+            <h2>درگاه خرید</h2>
+            <p>خوش آمدید</p>
+            
+            <form action="{{url_for('buy')}}" method="post">
+                <div class="input-group">
+                    <input type="number" id="card" name="card" class="input-field">
+                    <label for="card">شماره کارت</label>
+                    <div class="glow-line"></div>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="input-field">
+                    <label for="password">رمز دوم</label>
+                    <div class="glow-line"></div>
+                </div>
 
-<div class="product-grid">
-  {% for product in products %}
-  <div class="card">
-    <form action="{{url_for('add_to_cart')}}" method="post">
-      <img src="{{url_for('static',filename='upload/' + product.get('image'))}}" alt="{{product['product']}}">
-      <h3>{{product['product']}}</h3>
-      <p class="price">{{product['price']}} تومان</p>
-      <input type="hidden" name="product" value="{{product['product']}}">
-      <button type="submit" class="add-btn">افزودن به سبد خرید</button>
-    </form>
-
-    {% if send == product['product'] %}
-    <div class="success-message">
-      ✅ با موفقیت به سبد خرید اضافه شد
+                 <div class="input-group">
+                    <input type="password" id="password" name="CVV2" class="input-field">
+                    <label for="password">CVV2</label>
+                    <div class="glow-line"></div>
+                </div>
+                
+                <input type="submit" class="login-btn" value="{{total_price}}خرید">
+            </form>
+             <form action="{{url_for('logout')}}" method="get">
+                    <input type="submit" value="خروج و بازگشت" class="login-btn">
+                </form>
+        </div>
     </div>
-    {% endif %}
-
-     {% if rmv == product['product'] %}
-    <div class="remove-message">
-      ❌ محصول مورد نظر از سبد خرید حذف شد
-    </div>
-    {% endif %}
-
-    <form action="{{url_for('remove_from_cart')}}" method="post">
-      <input type="hidden" name="product" value="{{product['product']}}">
-      <button type="submit" class="remove-btn">حذف از سبد خرید</button>
-    </form>
-  </div>
-  {% endfor %}
-</div>
-<div id="particles-js"></div>
-        <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             particlesJS('particles-js', {
@@ -63,7 +68,7 @@
                         }
                     },
                     "color": {
-                        "value": "#00d4ff"
+                        "value": "#ff69b4"
                     },
                     "shape": {
                         "type": "circle",
@@ -98,7 +103,7 @@
                     "line_linked": {
                         "enable": true,
                         "distance": 150,
-                        "color": "#00d4ff",
+                        "color": "#ff1493",
                         "opacity": 0.6,
                         "width": 1.5
                     },
@@ -161,6 +166,4 @@
         });
     </script>
 </body>
-</html>       
-    </body>
 </html>

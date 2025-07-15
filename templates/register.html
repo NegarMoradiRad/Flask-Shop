@@ -1,20 +1,173 @@
 <!DOCTYPE html>
-><html>
+<html lang="en">
 <head>
-<title>ثبت نام</title>
-<meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت  نام</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='register.css')}}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap">
 </head>
-<body>
-    <div>
-        <form action="{{url_for('register')}}" method="post">
-            <label for="fullname">نام و نام خانوادگی</label>
-            <input type="text" id="fullname" name="fullname">
-            <label for="email">ایمیل</label>
-            <input type="email" id="email" name="email">
-            <label for="password">رمز عبور</label>
-            <input type="password" id="password" name="password">
-            <input type="submit" value="ثبت نام">
-        </form>
+<body dir="rtl">
+    <div id="particles-js"></div>
+    <div class="container">
+          {%if errors%}
+        <ul class="error-box">
+        {%for error in errors%}
+        <li>{{error}}</li>
+        {%endfor%}
+        </ul>
+        {%endif%}
+        {%if send%}
+        <p class="success-message">ثبت نام با موفقیت انجام شد!</p>
+        {%endif%}
+        <div class="form-box">
+            <h2>ثبت نام</h2>
+            
+            <form action="{{url_for('register')}}" method="post">
+                <div class="input-group">
+                    <input type="text" id="fullname" name="fullname" class="input-field">
+                    <label for="fullname">نام و نام خانوداگی</label>
+                    <div class="glow-line"></div>
+                </div>
+                
+                 <div class="input-group">
+                    <input type="email" id="email" name="email" class="input-field">
+                    <label for="email">ایمیل</label>
+                    <div class="glow-line"></div>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="input-field">
+                    <label for="password">رمز عبور</label>
+                    <div class="glow-line"></div>
+                </div>
+                
+                <input type="submit" class="login-btn" value="ثبت نام">
+                <div class="btn-glow">
+                    <p>راهنمای تنظیم  رمز عبور:
+                <ul>
+<li>رمز عبور باید حداقل ۸ کاراکتر باشه</li>
+<li>حداقل ۱ حرف کوچک داشته باشه</li>
+<li>حداقل ۱ حرف بزرگ داشته باشه</li>
+<li>حداقل ۱ عدد داشته باشه</li>
+<li>حداقل ۱ کاراکتر ویژه از مجموعه @$!%*?& داشته باشه</li>
+</ul>
+            </p>
+                </div>
+                   
+            </form>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 100,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffd700"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.8,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.4,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 5,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffd700",
+                        "opacity": 0.6,
+                        "width": 1.5
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "repulse"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 400,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 100,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+    </script>
 </body>
 </html>

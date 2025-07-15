@@ -3,19 +3,19 @@ from pymongo import MongoClient
 import bcrypt
 import re
 import json
+from datetime import timedelta
 
-client1=MongoClient("mongodb://localhost:27017/")
-db1=client1["shop"]
-collection_products=db1["products"]
-collection_carts=db1["carts"]
-collection_idcarts_products=db1["idcart/product"]
-
-client2=MongoClient("mongodb://localhost:27017/")
-db2=client2["users"]
-collection_users=db2["users"]
+client=MongoClient("mongodb://localhost:27017/")
+db=client["shop"]
+collection_products=db["products"]
+collection_carts=db["carts"]
+collection_idcarts_products=db["idcart/product"]
+collection_users=db["users"]
 
 app=Flask(__name__)
 app.secret_key="your_secret_key"
+app.permanent_session_lifetime = timedelta(minutes=30)
+
 upload_folder="/static/upload"
 app.config["UPLOAD_FOLDER"]=upload_folder
 
@@ -24,20 +24,32 @@ def homepage():
     products = list(collection_products.find())  
     return render_template("dashbord.html",products=products)
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST','GET'])
 def login():
+    if request.method=='GET':
+       return render_template('login.html')
     email=request.form.get("email","").strip()
     password=request.form.get("password","").strip()
+    remember=request.form.get('remember','').strip()
     products = list(collection_products.find())  
     errors=[]
     user=collection_users.find_one({"ایمیل":email})
+    if not email or not password:
+       errors.append("پر کردن تمام فیلدها الزامی است!")
     if user:
-       if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-        session['user'] = email
-        return render_template("dashbord.html",products=products)
+       if not bcrypt.checkpw(password.encode('utf-8'), user['رمز عبور']) :
+        errors.append(" رمز عبور وارد شده نادرست است")
+    if email and not user:
+       errors.append("ایمیل وارد شده نادرست است")
+    if errors:
+        print(errors)
+        return render_template("login.html",errors=errors)
+    session['user'] = email
+    if remember:
+       session.permanent = True
     else:
-       errors.append("ایمیل یا رمز عبور وارد شده نادرست است")
-       return render_template("login.html",errors=errors)
+       session.permanent = False
+    return redirect(url_for('buy'))
 
 @app.route('/register',methods=['GET','POST'])
 def register():
@@ -63,6 +75,8 @@ def register():
        errors.append("پر کردن تمام فیلدها الزامی است")
 
     if errors:
+       print("فرم ارسال شد:", email, fullname)
+       print("خطاها:", errors)
        return render_template("register.html",errors=errors)
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     document={
@@ -110,10 +124,61 @@ def viewcart():
    for p , q in cart.items():
       total_price+=q*products.find_one({"product":p}).get('price')
    return render_template('cart.html',cart=cart,products=products,total_price=total_price)
+@app.route('/buy', methods=['POST', 'GET'])
+def buy():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    email = session['user']
+    user = collection_users.find_one({'ایمیل': email})
+
+    products = collection_products
+    cart_cookie = request.cookies.get('cart')
+    cart = json.loads(cart_cookie) if cart_cookie else {}
+    total_price = 0
+    for p, q in cart.items():
+        total_price += q * products.find_one({"product": p}).get('price')
+
+    if request.method == 'GET':
+        return render_template('buy.html', cart=cart, user=user, total_price=total_price)
+
+    if request.method == 'POST':
+        card = request.form.get('card')
+        password = request.form.get('password')
+        CVV2 = request.form.get('CVV2')
+
+        validcard = re.compile(r'\b\d{16}\b')
+        validpassword = re.compile(r'\b\d{4,6}\b')
+        validcvv2 = re.compile(r'\b\d{3,4}\b')
+
+        errors = []
+
+        if not card or not password or not CVV2:
+            errors.append('پر کردن تمام فیلدها الزامی است')
+        if not validcard.match(card) and card:
+            errors.append('شماره کارت وارد شده نامعتبر است')
+        if not validpassword.match(password) and password:
+            errors.append('رمز دوم وارد شده نامعتبر است')
+        if not validcvv2.match(CVV2) and CVV2:
+            errors.append('CVV2 وارد شده نامعتبر است')
+
+        if errors:
+            return render_template('buy.html', errors=errors, user=user, cart=cart, total_price=total_price)
+
+        document = {
+            "نام کاربر": user.get('نام و نام خانوادگی'),
+            'پست الکترونیک': email,
+            "سفارش": cart
+        }
+        collection_carts.insert_one(document)
+
+        response = make_response(render_template('buy.html', cart=cart, send=True, total_price=total_price, user=user))
+        response.delete_cookie('cart')
+        return response 
 @app.route('/logout')
 def logout():
-    products = list(collection_products.find())  
-    return render_template("dashbord.html",products=products)
+    session.pop('user', None)
+    return redirect(url_for('homepage'))
 
 if __name__=="__main__":
     app.run(debug=True)
